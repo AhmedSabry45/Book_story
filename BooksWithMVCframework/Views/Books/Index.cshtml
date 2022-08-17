@@ -1,0 +1,145 @@
+﻿@model IEnumerable<BooksWithMVCframework.Models.Book>
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2 class="text-center text-dark">Books</h2>
+
+<hr />
+
+<a href="@Url.Action("Create")" class="btn btn-primary my-4">
+    <i class="icofont-ui-add"></i>
+    Add New Book
+</a>
+
+<span id="Msg" class="d-none">@TempData["Message"]</span>
+
+@*@if (!Model.Any())
+{*@
+
+    <div class="alert alert-warning @(Model.Any() ? "d-none":"")">
+        No Books Added yet!
+    </div>
+    @*}
+    else
+    {*@
+    <table class="table  @(!Model.Any()?"d-none":"")">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>AddedOn</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var book in Model)
+            {
+                <tr>
+                    @*<td>@book.Title</td>*@
+
+                    <td>@Html.ActionLink(book.Title, "Details", "Books", new {id=book.Id},null)</td>
+                    <td>@book.Author</td>
+                    <td>@book.categories.Name</td>
+                    <td>@book.Description</td>
+                    <td>@book.AddedOn</td>
+                    <td>
+
+                        <a href="@Url.Action("Edit", "Books", new {id=book.Id})" class="btn btn-primary">
+                            <i class="icofont-ui-edit"></i>
+                            Edit
+                        </a>
+                        @*Handel by Api Action*@
+                        <a href="javascript:;" class="btn btn-danger js-delete" data-id="@book.Id">
+                            <i class="icofont-ui-close"></i>
+                            Delete
+                        </a>
+
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+
+
+@*}*@
+
+@section Scripts
+    {
+    
+    <script>
+
+
+
+
+        $(document).ready(function () {
+
+            //for make Toastr appear only once 
+            toastr.options = {
+                "preventDuplicates": true
+            }
+
+            var message = $("#Msg").text();
+
+            if (message !== '') {
+                toastr.success(message);
+            }
+
+            $('.js-delete').on('click', function () {
+                var btn = $(this);
+                //alert(btn.data('id'));
+
+                //from bootbox
+                bootbox.confirm({
+                    message: "Are You Sure To Delete This Book",
+                    buttons: {
+                        confirm: {
+                            label: 'Yes',
+                            className: 'btn-danger'
+                        },
+                        cancel: {
+                            label: 'No',
+                            className: 'btn-outline-secondary'
+                        }
+                    },
+                    callback: function (result) {
+
+                        if (result) {
+                            $.ajax({
+                                url: '/api/books/' + btn.data('id'),
+                                method: 'DELETE',
+                                success: function () {
+                                    //btn.parents('tr').fadeOut(function () {
+                                    if ($('tbody tr').length === 1)
+                                        $('table').fadeOut(function () {
+                                            this.remove();
+                                            $('.alert').removeClass('d-none');
+
+                                        });
+                                    else {
+                                        btn.parents('tr').fadeOut(function () {
+                                            this.remove();
+
+                                    });
+                                         }
+                                    toastr.success('Book Deleted');
+                                },
+                                error: function () {
+                                    toastr.error('Something went wrong!!');
+
+                                }
+
+                            });
+                        }
+                    }
+                });
+ 
+            });
+        });
+    </script>
+    
+    }

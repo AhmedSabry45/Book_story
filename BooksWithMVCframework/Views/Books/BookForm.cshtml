@@ -1,0 +1,60 @@
+﻿@model BooksWithMVCframework.ViewModel.BookFormVm
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2 class="text-center text-primary">
+
+    @(Model.Id==0?"Add New Book":"Edit Book")
+</h2>
+<hr />
+
+@*to build form in Razor*@
+
+@using (Html.BeginForm("Save", "Books"))
+{
+
+    @Html.HiddenFor(m=>m.Id)
+     
+    @*string generate on server and server check if this action true or not*@
+    @Html.AntiForgeryToken()
+
+    <div class="form-group">
+
+        @Html.LabelFor(m => m.Title)
+        @Html.TextBoxFor(m => m.Title, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Title, null, new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Author)
+        @Html.TextBoxFor(m => m.Author, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Author, null, new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.categoriesId)
+        @Html.DropDownListFor(m => m.categoriesId, new SelectList(Model.categories, "id", "name"), "Select Categories", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.categoriesId, null, new { @class = "text-danger" })
+    </div>
+
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Description)
+        @Html.TextAreaFor(m => m.Description, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Description, null, new { @class = "text-danger" })
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+
+}
+@*for make validation when click on save with empty data field*@
+
+
+@section Scripts
+    
+    {
+    
+    @Scripts.Render("~/bundles/jqueryval")
+    
+    }  
